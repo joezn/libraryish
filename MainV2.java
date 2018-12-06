@@ -29,13 +29,12 @@ public class MainV2 {
 		 *  
 		 *  Final Step: Serialize EVERYTHING
 		*/
-		
-		Admin b = new Admin("admin", "admin");
-		Admin.aList.add(b);
-		UserAcc.createAcc("bill", "nye");
-		Book.createBook("Bible", "Jesus", "Fiction");
-		Book.createBook("Something", "Jesus", "Fiction");
-		Book.createBook("Ass", "Jesus", "Fiction");
+
+		Admin.readAccs(Admin.aList);
+		Book.readBooks(Book.booklist);
+		UserAcc.readAccs(UserAcc.ulist);
+		UserAcc.printList();
+		Book.printList();
 		menu();
 		
 		
@@ -86,6 +85,7 @@ public class MainV2 {
 			for(int i = 0; i < Book.booklist.size(); i++) {
 				if(Book.booklist.get(i).getTitle().equals(bTitle) == true) {
 					Book.booklist.remove(i);
+					Book.serializeBooks(Book.booklist);
 					System.out.println("Book Successfully Removed");
 				}				
 			}
@@ -131,22 +131,20 @@ public class MainV2 {
 				"\n5. Exit");
 		n = sUM.nextInt();
 		if(n == 1) {
-			System.out.println("CheckoutShit");
 			Scanner coScan = new Scanner(System.in);
 			do {
-			int checkOutID = -1;
+			String checkOutID ;
 			try{
-				System.out.println("Enter the BookID of the book you would like to CheckOut: ");
+				System.out.println("Enter the Title of the book you would like to CheckOut: ");
 			
-			checkOutID = coScan.nextInt();
+			checkOutID = coScan.nextLine();
 			}
 			catch(Exception e) {
 				System.out.println("Invalid input, please type integer value");
 				break;
 			}
-			if(checkOutID == -1 == false) {
 			for(int i = 0; i < Book.booklist.size(); i++) {
-				if(Book.booklist.get(i).getID() == checkOutID) {
+				if(Book.booklist.get(i).getTitle().equals(checkOutID) == true) {
 					System.out.println("The book you've selected is: " + Book.booklist.get(i).getTitle() +
 							"\nBy the Author: " + Book.booklist.get(i).getAuthor() +
 							"\nIs this correct? (Yes or no)");
@@ -158,6 +156,8 @@ public class MainV2 {
 						}
 						else {
 							Book.booklist.get(i).setCheckedOut(true);
+							UserAcc.serializeAcc(UserAcc.ulist);
+							Book.serializeBooks(Book.booklist);
 							System.out.println("You have checked out the Book: " + Book.booklist.get(i).getTitle() + 
 									"\nBy the Author: " + Book.booklist.get(i).getAuthor());
 							UserAcc.ulist.get(loggedIn).addBook(checkOutID);
@@ -167,22 +167,20 @@ public class MainV2 {
 					}
 				}
 			}
-		}
+		
 			}while(w == 1);
-			
-			
 		}
+			
+		
 		if(n == 2) {
-			System.out.println("CheckinShit");
-			System.out.println("Enter the Book ID of the book you would like to Check in: ");
-			int chkInID = sUM.nextInt(); 
+			System.out.println("Enter the Book Title of the book you would like to Check in: ");
+			String chkInID = scanText.nextLine(); 
 			UserAcc.ulist.get(loggedIn).checkInBook(chkInID);
 			
 		}
 		if(n == 3) {
 			Scanner searchScan = new Scanner(System.in);
 			Scanner textScan = new Scanner(System.in);
-			System.out.println("Search Shit");
 			int searchN;
 			do{
 				System.out.println("Search by:" +
@@ -249,6 +247,7 @@ public class MainV2 {
 		if(n == 4) {
 			System.out.println("Your checked out Books: ");
 			UserAcc.ulist.get(loggedIn).printBooks();
+			UserAcc.ulist.get(loggedIn).printBookIDs();
 				}
 			
 		
@@ -299,7 +298,6 @@ public class MainV2 {
 				System.out.println("Enter a users password: ");
 				adminPass = login.nextLine();
 				if(Admin.aList.get(i).getPassword().equals(adminPass) == true) {
-					System.out.println("you logged in idiot");
 					adminMenu();
 				}
 				else {
@@ -319,7 +317,6 @@ public class MainV2 {
 		String uPass = sCreateU.nextLine();
 		UserAcc.createAcc(uName, uPass);
 		System.out.println("Account Created!");
-		UserAcc.printList();
 	}
 	public static void loginUser() {
 		Scanner ulogin = new Scanner(System.in);

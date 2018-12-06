@@ -1,6 +1,9 @@
 package ish;
 
-public abstract class Account {
+import java.io.Serializable;
+
+@SuppressWarnings("serial")
+public abstract class Account implements Serializable {
 	
 	String username;
 	String password;

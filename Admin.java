@@ -1,15 +1,20 @@
 package ish;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 
-@SuppressWarnings("serial")
 public class Admin extends Account implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3815805910537489349L;
 	static ArrayList<Admin> aList = new ArrayList<>();
 	static File accList = new File("AdminAccountList.txt");
 	
@@ -33,6 +38,18 @@ public class Admin extends Account implements Serializable {
 			io.printStackTrace();
 		}
 		
+	}
+	
+	public static ArrayList<Admin> readAccs(ArrayList<Admin> list) {
+		try {
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(accList));
+			aList = (ArrayList<Admin>) ois.readObject();
+			System.out.println("File Successfully Read");
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return aList;
 	}
 	
 	public String getUsername() {

@@ -1,16 +1,21 @@
 package ish;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@SuppressWarnings("serial")
 public class Book implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4835520790312645801L;
 	private String title;
 	private String author;
 	private String genre;
@@ -32,7 +37,7 @@ public class Book implements Serializable {
 		this.author = author;
 		this.genre = genre;
 		checkedOut = false;
-		bID = count.incrementAndGet();
+		bID = (booklist.get(booklist.size() - 1).getID() + 1);
 	}
 	
 	public String getTitle() {
@@ -77,6 +82,18 @@ public class Book implements Serializable {
 		
 	}
 	
+	public static ArrayList<Book> readBooks(ArrayList<Book> list) {
+		try {
+			ObjectInputStream oi = new ObjectInputStream(new FileInputStream(bList));
+			booklist = (ArrayList<Book>) oi.readObject();
+			System.out.println("File Successfully Read");
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return booklist;
+	}
+	
 	public static void printList() {
 		for(Book b: booklist) {
 			System.out.println(b.toString());
@@ -117,7 +134,7 @@ public class Book implements Serializable {
 			Status = "\tThis Book is available";
 		}
 		
-		return "Title- " + title + "\tAuthor- " + author + "\tGenre- " + "\tBook ID " + bID + Status;
+		return "Title- " + title + "\tAuthor- " + author + "\tGenre- " + genre +  "\tBook ID " + bID + Status;
 	}
 
 	public Boolean getCheckedOut() {

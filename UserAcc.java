@@ -8,14 +8,16 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@SuppressWarnings("serial")
 public class UserAcc extends Account implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3881595250232811528L;
 	static ArrayList<UserAcc> ulist = new ArrayList<>();
 	static File accFile = new File("AccountList.txt");
-	private ArrayList<Integer> checkedOutBooks = new ArrayList<>();
+	private ArrayList<String> checkedOutBooks = new ArrayList<>();
 	private int aID;
-	private static final AtomicInteger count = new AtomicInteger(-1);
 	
 	UserAcc() {
 		username = null;
@@ -26,7 +28,8 @@ public class UserAcc extends Account implements Serializable {
 	UserAcc(String username, String password) {
 		this.username = username;
 		this.password = password;
-		aID = count.incrementAndGet();
+		aID = ulist.get(ulist.size() - 1).getId() + 1 ;
+		checkedOutBooks = new ArrayList<String>();
 		
 	}
 	public String getUsername() {
@@ -41,34 +44,53 @@ public class UserAcc extends Account implements Serializable {
 		return aID;
 	}
 	
-	public void addBook(int ID) {
-		checkedOutBooks.add(ID);
+	public void addBook(String title) {
+		checkedOutBooks.add(title);
+		serializeAcc(ulist);
 	}
-	public void removeBook(int ID) {
-		checkedOutBooks.remove(ID);
+	public void removeBook(String title) {
+		checkedOutBooks.remove(title);
+		serializeAcc(ulist);
 	}
 	
-	public void checkInBook(int ID) { 
+	public void printBookIDs() {
+		for(String i: checkedOutBooks) {
+			System.out.println(i + " ");
+		}
+	}
+	
+	public void emergancyEmpty() {
+		checkedOutBooks.clear();
+	}
+	public void checkInBook(String title) { 
 		Scanner scan = new Scanner(System.in);
-		if(Book.booklist.get(ID).getCheckedOut() == true) {
-			System.out.println("Would you like to check in " + Book.booklist.get(ID).getTitle() + "? (yes or no)");
+		
+		if(checkedOutBooks.contains(title)){
+			System.out.println("Would you like to check in " + title + "? (yes or no)");
 			String yON = scan.nextLine();
-			if(yON.equalsIgnoreCase("yes"));{
-				checkedOutBooks.remove(ID);
-				Book.booklist.get(ID).setCheckedOut(false);
-				System.out.println("Book successfully checked in!");
+			if(yON.equalsIgnoreCase("yes")) {
+				for(int i = 0; i < Book.booklist.size(); i++) {
+					if(title.equals(Book.booklist.get(i).getTitle()) == true){
+						checkedOutBooks.remove(title);
+						Book.booklist.get(i).setCheckedOut(false);
+						serializeAcc(ulist);
+						Book.serializeBooks(Book.booklist);
+						System.out.println("Book Successfully Checked in!");
+					}
+				}
 			}
 		}
 		else {
-			System.out.println("This book isn't checked out");
+			System.out.println("That book doesn't seem to be checked out to you");
 		}
+
 	}
 	
 	public void printBooks() {
 		for(int i = 0; i < checkedOutBooks.size(); i++) {
-			int ID = checkedOutBooks.get(i);
+			String title = checkedOutBooks.get(i);
 			for(int z = 0; z < Book.booklist.size(); z++) {
-				if(Book.booklist.get(z).getID() == ID) {
+				if(Book.booklist.get(z).getTitle().equals(title) == true) {
 					System.out.println(Book.booklist.get(z).toString());
 				}
 			}
@@ -107,6 +129,7 @@ public class UserAcc extends Account implements Serializable {
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(accFile));
 			ulist = (ArrayList<UserAcc>) ois.readObject();
+			System.out.println("File Successfully Read");
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
